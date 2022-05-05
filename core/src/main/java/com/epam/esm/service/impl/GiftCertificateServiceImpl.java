@@ -6,7 +6,7 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateDto;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.service.GiftCertificateDtoService;
+import com.epam.esm.service.GiftCertificateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class GiftCertificateDtoServiceImpl implements GiftCertificateDtoService {
+public class GiftCertificateServiceImpl implements GiftCertificateService {
     private static final String DOUBLE_REGEX = "^[1-9]+[0-9]*.\\d+";
     private static final String INTEGER_REGEX = "^[1-9]+[0-9]*$";
     private final GiftCertificateDao giftCertificateDao;

@@ -3,9 +3,8 @@ package com.epam.esm.service;
 import com.epam.esm.entity.GiftCertificateDto;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface GiftCertificateDtoService extends BaseService<GiftCertificateDto> {
+public interface GiftCertificateService extends BaseService<GiftCertificateDto> {
     List<GiftCertificateDto> findByTagName(String tagName);
 
     List<GiftCertificateDto> findByPartOfName(String giftCertificateName);
