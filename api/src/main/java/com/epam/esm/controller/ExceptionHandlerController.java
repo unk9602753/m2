@@ -1,4 +1,4 @@
-package com.epam.esm.exception;
+package com.epam.esm.controller;
 
 import com.epam.esm.config.Translator;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
-public class CustomException extends ResponseEntityExceptionHandler {
+public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Object> handleNodataFoundException(NoSuchElementException ex) {
@@ -131,7 +131,7 @@ public class CustomException extends ResponseEntityExceptionHandler {
     }
 
     //////////////////////////////////////////////////////
-    public CustomException() {
+    public ExceptionHandlerController() {
         super();
     }
 
