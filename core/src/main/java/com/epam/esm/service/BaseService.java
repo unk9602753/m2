@@ -10,5 +10,5 @@ public interface BaseService<T> {
 
     Optional<T> create(T entity);
 
-    Optional<T> delete(long id);
+    void delete(long id);
 }

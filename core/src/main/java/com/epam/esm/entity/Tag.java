@@ -14,8 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Tag {
     @JsonDeserialize(using = IdDeserializer.class)
-    private long id;
+    private Long id;
     @JsonDeserialize(using = StringDeserializer.class)
     private String name;
 
+    public Tag(String name) {
+        this.name=name;
+    }
 }

@@ -24,20 +24,21 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             INSERT INTO certificates_has_tags (gift_certificate_id,tag_id) VALUES(?,?)""";
     private static final String DELETE_TAG_IN_CERTIFICATE = """
             DELETE FROM certificates_has_tags WHERE gift_certificate_id=?""";
-    private static final String SELECT_ALL = "SELECT * FROM gift_certificate";
-    private static final String SELECT_BY_ID = "SELECT * FROM gift_certificate WHERE id=?";
+    private static final String SELECT_ALL = "SELECT id,name ,description,price,duration,create_date,last_update_date FROM gift_certificate";
+    private static final String SELECT_BY_ID = "SELECT id,name ,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE id=?";
     private static final String INSERT = """
             INSERT INTO gift_certificate (id,name ,description,price,duration,create_date,last_update_date) 
             VALUES (NULL,?,?,?,?,?,?)""";
     private static final String UPDATE = """
             UPDATE gift_certificate SET name=? ,description=?,price=?,duration=?,create_date=?,last_update_date=?
             WHERE id=?""";
-    private static final String SELECT_BY_PART_OF_NAME = "SELECT * FROM gift_certificate WHERE name LIKE ?";
+    private static final String SELECT_BY_PART_OF_NAME = "SELECT id,name ,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE name LIKE ?";
     private static final String REMOVE = "DELETE FROM gift_certificate WHERE id=?;";
-    private static final String ACS_SORT_BY_DATE = "SELECT * FROM gift_certificate ORDER BY create_date";
-    private static final String DESC_SORT_BY_DATE = "SELECT * FROM gift_certificate ORDER BY create_date DESC ";
+
+    private static final String SORT= "SELECT (id,name ,description,price,duration,create_date,last_update_date) FROM gift_certificate" +
+            "ORDER BY ?";
     private static final String SELECT_BY_TAG_NAME = """
-            SELECT * FROM gift_certificate WHERE id IN 
+            SELECT id,name ,description,price,duration,create_date,last_update_date FROM gift_certificate WHERE id IN 
             (SELECT gift_certificate_id FROM tag JOIN certificates_has_tags ON tag.id=certificates_has_tags.tag_id AND name = ?)
             """;
 
@@ -102,13 +103,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public List<GiftCertificate> ascSortByDate() {
-        return jdbcTemplate.query(ACS_SORT_BY_DATE, new GiftCertificateRowMapper());
-    }
-
-    @Override
-    public List<GiftCertificate> descSortByDate() throws DataAccessException {
-        return jdbcTemplate.query(DESC_SORT_BY_DATE, new GiftCertificateRowMapper());
+    public List<GiftCertificate> sort(String direction, String criteria) {
+        return null;
     }
 
     @Override

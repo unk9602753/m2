@@ -21,7 +21,7 @@ import java.util.List;
 public class GiftCertificateDto {
 
     @JsonDeserialize(using = IdDeserializer.class)
-    private long id;
+    private Long id;
     @JsonDeserialize(using = StringDeserializer.class)
     private String name;
     @JsonDeserialize(using = StringDeserializer.class)
@@ -43,5 +43,17 @@ public class GiftCertificateDto {
         this.createDate = giftCertificate.getCreateDate();
         this.lastUpdateDate = giftCertificate.getLastUpdateDate();
         this.tags = new ArrayList<>();
+    }
+
+    public GiftCertificateDto(String name, String description, double price,
+                              int duration, LocalDateTime createDate,
+                              LocalDateTime lastUpdateDate, List<Tag> tags) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.duration = duration;
+        this.createDate = createDate;
+        this.lastUpdateDate = lastUpdateDate;
+        this.tags = tags;
     }
 }

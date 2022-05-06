@@ -9,9 +9,7 @@ public interface GiftCertificateDao extends Dao<GiftCertificate> {
 
     List<GiftCertificate> findByPartOfName(String giftCertificateName);
 
-    List<GiftCertificate> ascSortByDate();
-
-    List<GiftCertificate> descSortByDate();
+    List<GiftCertificate> sort(String direction, String criteria);
 
     long addTagToGiftCertificate(long giftCertificateId, long tagId);
 

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/tags")
@@ -42,7 +41,7 @@ public class TagController {
     @DeleteMapping(value = "{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public ResponseEntity<String> deleteTag(@PathVariable long id) {
-        return tagService.delete(id).map(result -> new ResponseEntity<>("Tag was deleted successfully", HttpStatus.NO_CONTENT))
-                .orElseThrow(() -> new NoSuchElementException(Translator.toLocale("ex.no.el") + id));
+        tagService.delete(id);
+        return new ResponseEntity<>("Tag was deleted successfully", HttpStatus.NO_CONTENT);
     }
 }

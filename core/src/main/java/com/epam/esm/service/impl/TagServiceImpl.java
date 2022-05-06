@@ -16,26 +16,22 @@ public class TagServiceImpl implements TagService {
     private final TagDao tagDao;
 
     @Override
-    @Transactional
     public Optional<Tag> find(long id) {
         return tagDao.find(id);
     }
 
     @Override
-    @Transactional
     public List<Tag> findAll() {
         return tagDao.findAll();
     }
 
     @Override
     @Transactional
-    public Optional<Tag> delete(long id) {
+    public void delete(long id) {
         Optional<Tag> optTag = tagDao.find(id);
         if (optTag.isPresent()) {
             tagDao.remove(id);
-            return optTag;
         }
-        return optTag;
     }
 
     @Override
