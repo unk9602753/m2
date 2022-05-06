@@ -9,9 +9,7 @@ public interface GiftCertificateService extends BaseService<GiftCertificateDto> 
 
     List<GiftCertificateDto> findByPartOfName(String giftCertificateName);
 
-    List<GiftCertificateDto> ascSortByDate();
-
-    List<GiftCertificateDto> descSortByDate();
+    List<GiftCertificateDto> sort(String direction, String criteria);
 
     void update(GiftCertificateDto giftCertificateDto, long id);
 }

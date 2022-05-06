@@ -41,7 +41,7 @@ public class TagController {
     @DeleteMapping(value = "{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public ResponseEntity<String> deleteTag(@PathVariable long id) {
-        return tagService.delete(id).map(result -> new ResponseEntity<>("Tag was deleted successfully", HttpStatus.NO_CONTENT))
-                .orElseThrow(() -> new NoSuchElementException(Translator.toLocale("ex.no.el") + id));
+        tagService.delete(id);
+        return new ResponseEntity<>("Tag was deleted successfully", HttpStatus.NO_CONTENT);
     }
 }

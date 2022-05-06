@@ -41,8 +41,8 @@ public class GiftCertificateController {
     @DeleteMapping(value = "{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public ResponseEntity<String> deleteCertificate(@PathVariable long id) {
-        return giftCertificateService.delete(id).map(result -> new ResponseEntity<>("Certificate was deleted successfully", HttpStatus.NO_CONTENT))
-                .orElseThrow(() -> new NoSuchElementException(Translator.toLocale("ex.no.el") + id));
+        giftCertificateService.delete(id);
+        return new ResponseEntity<>("Certificate was deleted successfully", HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(path = "{id}")
@@ -77,14 +77,14 @@ public class GiftCertificateController {
         return giftCertificateService.findByPartOfName(search);
     }
 
-    @RequestMapping(value = "", params = "sort")
-    public List<GiftCertificateDto> getSortCertificate(@RequestParam String sort) {
-        if (sort.equals("date_asc")) {
-            return giftCertificateService.ascSortByDate();
-        } else if (sort.equals("date_desc")) {
-            return giftCertificateService.descSortByDate();
-        } else {
-            return giftCertificateService.ascSortByDate();
-        }
-    }
+//    @RequestMapping(value = "", params = "sort")
+//    public List<GiftCertificateDto> getSortCertificate(@RequestParam String sort) {
+//        if (sort.equals("date_asc")) {
+//            return giftCertificateService.ascSortByDate();
+//        } else if (sort.equals("date_desc")) {
+//            return giftCertificateService.descSortByDate();
+//        } else {
+//            return giftCertificateService.ascSortByDate();
+//        }
+//    }
 }

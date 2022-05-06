@@ -19,14 +19,14 @@ import java.util.Optional;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private static final String SELECT_ALL = "SELECT * FROM tag";
-    private static final String SELECT_BY_ID = "SELECT * FROM tag WHERE id=?";
+    private static final String SELECT_ALL = "SELECT id,name FROM tag";
+    private static final String SELECT_BY_ID = "SELECT id,name  FROM tag WHERE id=?";
     private static final String INSERT = "INSERT INTO tag (id,name) VALUES (NULL,?)";
     private static final String REMOVE = "DELETE FROM tag WHERE id=?";
     private static final String SELECT_ALL_TAGS_FOR_CERTIFICATE = """
-            SELECT * FROM tag WHERE id IN (SELECT tag_id FROM certificates_has_tags WHERE gift_certificate_id = ?)
+            SELECT id,name  FROM tag WHERE id IN (SELECT tag_id FROM certificates_has_tags WHERE gift_certificate_id = ?)
             """;
-    private static final String SELECT_BY_NAME = "SELECT * FROM tag WHERE name=?";
+    private static final String SELECT_BY_NAME = "SELECT id,name  FROM tag WHERE name=?";
 
     private JdbcTemplate jdbcTemplate;
 
