@@ -8,7 +8,7 @@ public interface BaseService<T> {
 
     List<T> findAll();
 
-    Optional<T> create(T entity);
+    void create(T entity);
 
     void delete(long id);
 }

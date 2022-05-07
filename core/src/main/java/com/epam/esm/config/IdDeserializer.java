@@ -1,10 +1,12 @@
 package com.epam.esm.config;
 
+import com.epam.esm.exception.DeserializeException;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
 
@@ -18,10 +20,11 @@ public class IdDeserializer extends StdDeserializer {
     }
 
     @Override
+    @SneakyThrows(DeserializeException.class)
     public Long deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
         String id = p.getText();
         if (id != null) {
-            throw new RuntimeException(Translator.toLocale("ex.id.not.null"), null);
+            throw new DeserializeException(Translator.toLocale("exception.id.not.null"));
         }
         return 0L;
     }
