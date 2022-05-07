@@ -1,9 +1,12 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.config.Translator;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.TagService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,22 +29,24 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional
+    @SneakyThrows(ServiceException.class)
     public void delete(long id) {
-        Optional<Tag> optTag = tagDao.find(id);
-        if (optTag.isPresent()) {
-            tagDao.remove(id);
+        int statement = tagDao.remove(id);
+        if(statement == 0){
+            throw new ServiceException(Translator.toLocale("exception.remove.tag"));
         }
     }
 
     @Override
     @Transactional
-    public Optional<Tag> create(Tag tag) {
-        if (tag != null && tagDao.findByName(tag.getName()).isEmpty()) {
-            long id = tagDao.insert(tag).longValue();
-            tag.setId(id);
-            return Optional.of(tag);
+    @SneakyThrows(ServiceException.class)
+    public void create(Tag tag) {
+        boolean isTagExist = tagDao.findByName(tag.getName()).isPresent();
+        if (!isTagExist) {
+            tagDao.insert(tag);
+        }else{
+            throw new ServiceException("exception.tag.exist");
         }
-        return Optional.empty();
     }
 }
+

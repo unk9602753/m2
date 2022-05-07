@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@PropertySource({"classpath:dev-connection.properties","classpath:prod-connection.properties"})
+@PropertySource("classpath:${spring.profiles.active}-connection.properties")
 public class DaoConfig {
 
     @Autowired
@@ -19,30 +19,24 @@ public class DaoConfig {
     @Bean
     @Profile("dev")
     public DataSource dataSource(HikariConfig hikariConfig) {
-        hikariConfig.setJdbcUrl(environment.getProperty("db.dev.url"));
-        hikariConfig.setUsername(environment.getProperty("db.dev.username"));
-        hikariConfig.setPassword(environment.getProperty("db.dev.pw"));
-        hikariConfig.setDriverClassName(environment.getProperty("db.dev.cn"));
-        hikariConfig.setMaximumPoolSize(Integer.parseInt(environment.getProperty("db.dev.ps")));
-        HikariDataSource dataSource = new HikariDataSource(hikariConfig);
-        return dataSource;
+        return new HikariDataSource(hikariConfig);
     }
 
     @Bean
     @Profile("prod")
     public DataSource prodDataSource(HikariConfig hikariConfig) {
-        hikariConfig.setJdbcUrl(environment.getProperty("db.prod.url"));
-        hikariConfig.setUsername(environment.getProperty("db.prod.username"));
-        hikariConfig.setPassword(environment.getProperty("db.prod.pw"));
-        hikariConfig.setDriverClassName(environment.getProperty("db.prod.cn"));
-        hikariConfig.setMaximumPoolSize(Integer.parseInt(environment.getProperty("db.prod.ps")));
-        HikariDataSource dataSource = new HikariDataSource(hikariConfig);
-        return dataSource;
+        return new HikariDataSource(hikariConfig);
     }
 
     @Bean
     public HikariConfig hikariConfig() {
-        return new HikariConfig();
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(environment.getProperty("db.url"));
+        hikariConfig.setUsername(environment.getProperty("db.username"));
+        hikariConfig.setPassword(environment.getProperty("db.pw"));
+        hikariConfig.setDriverClassName(environment.getProperty("db.cn"));
+        hikariConfig.setMaximumPoolSize(Integer.parseInt(environment.getProperty("db.ps")));
+        return hikariConfig;
     }
 
     @Bean

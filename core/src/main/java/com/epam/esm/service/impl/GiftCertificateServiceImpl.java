@@ -6,10 +6,11 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateDto;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.ServiceException;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.validator.NumberValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +25,12 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateDao giftCertificateDao;
     private final TagDao tagDao;
 
-    @Autowired
-    private final NumberValidator numberValidator;
-
     @Override
-    @Transactional
+    @SneakyThrows(ServiceException.class)
     public void delete(long id) {
-        Optional<GiftCertificateDto> optCertificate = find(id);
-        if (optCertificate.isPresent()) {
-            giftCertificateDao.remove(id);
+        int statement = giftCertificateDao.remove(id);
+        if(statement == 0){
+            throw new ServiceException(Translator.toLocale("exception.remove.certificate"));
         }
     }
 
@@ -52,126 +50,105 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     @Transactional
     public List<GiftCertificateDto> findAll() {
-        List<GiftCertificateDto> dtoList = new ArrayList<>();
-        List<GiftCertificate> all = giftCertificateDao.findAll();
-        all.forEach(g -> {
-            List<Tag> allTagsByCertificateId = tagDao.findAllTagsByCertificateId(g.getId());
-            GiftCertificateDto giftCertificateDto = new GiftCertificateDto(g);
-            giftCertificateDto.setTags(allTagsByCertificateId);
-            dtoList.add(giftCertificateDto);
-        });
-        return dtoList;
+        List<GiftCertificate> giftCertificates = giftCertificateDao.findAll();
+        return dtoPresenting(giftCertificates);
     }
 
     @Override
     @Transactional
-    public List<GiftCertificateDto> findByTagName(String tagName) {
-        List<GiftCertificateDto> dtoList = new ArrayList<>();
-        List<GiftCertificate> giftCertificates = giftCertificateDao.findByTagName(tagName);
-        giftCertificates.forEach(g -> {
-            GiftCertificateDto giftCertificateDto = new GiftCertificateDto(g);
-            List<Tag> allTagsByCertificateId = tagDao.findAllTagsByCertificateId(g.getId());
-            giftCertificateDto.setTags(allTagsByCertificateId);
-            dtoList.add(giftCertificateDto);
-        });
-        return dtoList;
+    public List<GiftCertificateDto> findByCriteria(String criteria, String name) {
+        List<GiftCertificate> giftCertificates = giftCertificateDao.findByCriteria(criteria, name);
+        return dtoPresenting(giftCertificates);
     }
 
     @Override
     @Transactional
-    public List<GiftCertificateDto> findByPartOfName(String giftCertificateName) {
-        List<GiftCertificateDto> dtoList = new ArrayList<>();
-        List<GiftCertificate> giftCertificates = giftCertificateDao.findByPartOfName(giftCertificateName);
-        giftCertificates.forEach(g -> {
-            GiftCertificateDto giftCertificateDto = new GiftCertificateDto(g);
-            List<Tag> allTagsByCertificateId = tagDao.findAllTagsByCertificateId(g.getId());
-            giftCertificateDto.setTags(allTagsByCertificateId);
-            dtoList.add(giftCertificateDto);
-        });
-        return dtoList;
-    }
-
-    @Override
     public List<GiftCertificateDto> sort(String direction, String criteria) {
-        return null;
+        List<GiftCertificate> giftCertificates = giftCertificateDao.sort(direction, criteria);
+        return dtoPresenting(giftCertificates);
     }
 
     @Override
     @Transactional
-    public Optional<GiftCertificateDto> create(GiftCertificateDto giftCertificateDto) {
+    @SneakyThrows(ServiceException.class)
+    public void create(GiftCertificateDto giftCertificateDto) {
         GiftCertificate giftCertificate = new GiftCertificate(giftCertificateDto);
         List<Tag> tags = giftCertificateDto.getTags();
-        if (!isValidPriceAndDuration(giftCertificate)) {
-            throw new RuntimeException(Translator.toLocale("ex.less.value"));
+        if (isValidPriceAndDuration(giftCertificate)) {
+            setCreatedAndUpdatedDate(giftCertificate, LocalDateTime.now(), LocalDateTime.now());
+            long id = giftCertificateDao.insert(giftCertificate).longValue();
+            linkCertificateWithTags(tags, id);
+        } else {
+            throw new ServiceException(Translator.toLocale("exception.create.certificate"));
         }
-        setCreatedAndUpdatedDate(giftCertificate,LocalDateTime.now(),LocalDateTime.now());
-        long id = giftCertificateDao.insert(giftCertificate).longValue();
+    }
+
+    @Override
+    @Transactional
+    @SneakyThrows(ServiceException.class)
+    public void update(GiftCertificateDto giftCertificateDto, long id) {
+        Optional<GiftCertificate> optGift = giftCertificateDao.find(id);
+        GiftCertificate giftCertificate = new GiftCertificate(giftCertificateDto);
+        if (isValidPriceAndDuration(giftCertificate)) {
+            setCreatedAndUpdatedDate(giftCertificate, optGift.get().getCreateDate(), LocalDateTime.now());
+            List<Tag> tags = giftCertificateDto.getTags();
+            giftCertificateDao.update(giftCertificate);
+            giftCertificateDao.removeTagToGiftCertificate(id);
+            linkCertificateWithTags(tags, id);
+        } else {
+            throw new ServiceException(Translator.toLocale("exception.update.certificate"));
+        }
+    }
+
+    @Transactional
+    void linkCertificateWithTags(List<Tag> tags, long certificateId) {
         if (tags != null) {
-            tags.stream().filter(t->tagDao.findByName(t.getName()).isEmpty()).forEach(System.out::println);
             tags.forEach(t -> {
                 if (tagDao.findByName(t.getName()).isEmpty()) {
                     tagDao.insert(t);
                 }
-                giftCertificateDao.addTagToGiftCertificate(id, tagDao.findByName(t.getName()).get().getId());
+                giftCertificateDao.addTagToGiftCertificate(certificateId, tagDao.findByName(t.getName()).get().getId());
             });
         }
-        return find(id);
+    }
+
+    private List<GiftCertificateDto> dtoPresenting(List<GiftCertificate> giftCertificates) {//todo --name of method--
+        List<GiftCertificateDto> dtoList = new ArrayList<>();
+        giftCertificates.forEach(g -> {
+            GiftCertificateDto giftCertificateDto = new GiftCertificateDto(g);
+            List<Tag> allTagsByCertificateId = tagDao.findAllTagsByCertificateId(g.getId());
+            giftCertificateDto.setTags(allTagsByCertificateId);
+            dtoList.add(giftCertificateDto);
+        });
+        return dtoList;
+    }
+
+    private boolean isValidPriceAndDuration(GiftCertificate giftCertificate) {
+        return NumberUtils.compare((int) (double) giftCertificate.getPrice(), 0) > 0
+                && NumberUtils.compare(giftCertificate.getDuration(), 0) > 0;
     }
 
     @Override
-    @Transactional
-    public void update(GiftCertificateDto giftCertificateDto, long id) {
-        Optional<GiftCertificate> optGift = giftCertificateDao.find(id);
-        GiftCertificate giftCertificate = new GiftCertificate(giftCertificateDto);
-        if (!isValidPriceAndDuration(giftCertificate)) {
-            throw new RuntimeException(Translator.toLocale("ex.less.value"));
+    public void updateObject(GiftCertificateDto dto, GiftCertificateDto patch) {//todo use reflection?
+        if (patch.getName() != null) {
+            dto.setName(patch.getName());
         }
-        setCreatedAndUpdatedDate(giftCertificate,optGift.get().getCreateDate(),LocalDateTime.now());
-        List<Tag> tags = giftCertificateDto.getTags();
-        giftCertificateDao.update(giftCertificate);
-        giftCertificateDao.removeTagToGiftCertificate(id);
-        tags.forEach(t -> {
-            if (tagDao.findByName(t.getName()).isEmpty()) {
-                tagDao.insert(t);
-            }
-            giftCertificateDao.addTagToGiftCertificate(id, tagDao.findByName(t.getName()).get().getId());
-        });
+        if (patch.getDescription() != null) {
+            dto.setDescription(patch.getDescription());
+        }
+        if (patch.getTags() != null) {
+            dto.setTags(patch.getTags());
+        }
+        if (patch.getPrice() != null) {
+            dto.setPrice(patch.getPrice());
+        }
+        if (patch.getDuration() != null) {
+            dto.setDuration(patch.getDuration());
+        }
     }
 
-    private boolean isValidPriceAndDuration(GiftCertificate giftCertificate){
-        return numberValidator.isPositiveDouble(String.valueOf(giftCertificate.getPrice()))
-                && numberValidator.isPositiveInteger(String.valueOf(giftCertificate.getDuration()));
-    }
-
-    private void setCreatedAndUpdatedDate(GiftCertificate giftCertificate, LocalDateTime created, LocalDateTime updated){
+    private void setCreatedAndUpdatedDate(GiftCertificate giftCertificate, LocalDateTime created, LocalDateTime updated) {
         giftCertificate.setCreateDate(created);
         giftCertificate.setLastUpdateDate(updated);
     }
 }
-//    @Override
-//    @Transactional
-//    public List<GiftCertificateDto> ascSortByDate() {
-//        List<GiftCertificateDto> dtoList = new ArrayList<>();
-//        List<GiftCertificate> giftCertificates = giftCertificateDao.ascSortByDate();
-//        giftCertificates.forEach(g -> {
-//            GiftCertificateDto giftCertificateDto = new GiftCertificateDto(g);
-//            List<Tag> allTagsByCertificateId = tagDao.findAllTagsByCertificateId(g.getId());
-//            giftCertificateDto.setTags(allTagsByCertificateId);
-//            dtoList.add(giftCertificateDto);
-//        });
-//        return dtoList;
-//    }
-//
-//    @Override
-//    @Transactional
-//    public List<GiftCertificateDto> descSortByDate() {
-//        List<GiftCertificateDto> dtoList = new ArrayList<>();
-//        List<GiftCertificate> giftCertificates = giftCertificateDao.descSortByDate();
-//        giftCertificates.forEach(g -> {
-//            GiftCertificateDto giftCertificateDto = new GiftCertificateDto(g);
-//            List<Tag> allTagsByCertificateId = tagDao.findAllTagsByCertificateId(g.getId());
-//            giftCertificateDto.setTags(allTagsByCertificateId);
-//            dtoList.add(giftCertificateDto);
-//        });
-//        return dtoList;
-//    }

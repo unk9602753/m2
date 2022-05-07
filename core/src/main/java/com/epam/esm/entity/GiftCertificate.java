@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GiftCertificate {
-    private Long id;
+    private long id;
     private String name;
     private String description;
-    private double price;
-    private int duration;
+    private Double price;
+    private Integer duration;
     @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime createDate;
     @JsonSerialize(using = ToStringSerializer.class)
