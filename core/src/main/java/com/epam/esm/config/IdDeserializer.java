@@ -4,7 +4,6 @@ import com.epam.esm.exception.DeserializeException;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import lombok.SneakyThrows;
 
@@ -24,7 +23,7 @@ public class IdDeserializer extends StdDeserializer {
     public Long deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
         String id = p.getText();
         if (id != null) {
-            throw new DeserializeException(Translator.toLocale("exception.id.not.null"));
+            throw new DeserializeException("exception.parse.id");
         }
         return 0L;
     }

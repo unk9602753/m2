@@ -26,4 +26,5 @@ public class DispatcherServletInitializer extends AbstractAnnotationConfigDispat
         super.onStartup(servletContext);
         servletContext.setInitParameter("spring.profiles.active", "dev");
     }
+
 }

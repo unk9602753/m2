@@ -1,6 +1,5 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.config.Translator;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
@@ -19,8 +18,13 @@ public class TagServiceImpl implements TagService {
     private final TagDao tagDao;
 
     @Override
+    @SneakyThrows(ServiceException.class)
     public Optional<Tag> find(long id) {
-        return tagDao.find(id);
+        Optional<Tag> optTag = tagDao.find(id);
+        if (optTag.isPresent()) {
+            return optTag;
+        }
+        throw new ServiceException("exception.find.tag", id);
     }
 
     @Override
@@ -32,8 +36,8 @@ public class TagServiceImpl implements TagService {
     @SneakyThrows(ServiceException.class)
     public void delete(long id) {
         int statement = tagDao.remove(id);
-        if(statement == 0){
-            throw new ServiceException(Translator.toLocale("exception.remove.tag"));
+        if (statement == 0) {
+            throw new ServiceException("exception.delete.tag",id);
         }
     }
 
@@ -44,8 +48,8 @@ public class TagServiceImpl implements TagService {
         boolean isTagExist = tagDao.findByName(tag.getName()).isPresent();
         if (!isTagExist) {
             tagDao.insert(tag);
-        }else{
-            throw new ServiceException("exception.tag.exist");
+        } else {
+            throw new ServiceException("exception.create.tag");
         }
     }
 }

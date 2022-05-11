@@ -13,18 +13,11 @@ import javax.sql.DataSource;
 @ComponentScan("com.epam.esm")
 @PropertySource("classpath:${spring.profiles.active}-connection.properties")
 public class DaoConfig {
-
     @Autowired
     private Environment environment;
-    @Bean
-    @Profile("dev")
-    public DataSource dataSource(HikariConfig hikariConfig) {
-        return new HikariDataSource(hikariConfig);
-    }
 
     @Bean
-    @Profile("prod")
-    public DataSource prodDataSource(HikariConfig hikariConfig) {
+    public DataSource dataSource(HikariConfig hikariConfig) {
         return new HikariDataSource(hikariConfig);
     }
 
@@ -43,5 +36,4 @@ public class DaoConfig {
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
-
 }

@@ -11,6 +11,9 @@ import lombok.SneakyThrows;
 import java.io.IOException;
 
 public class StringDeserializer extends StdDeserializer<String> {
+    public StringDeserializer() {
+        this(null);
+    }
 
     public StringDeserializer(Class<?> vc) {
         super(vc);
@@ -20,7 +23,7 @@ public class StringDeserializer extends StdDeserializer<String> {
     @SneakyThrows(DeserializeException.class)
     public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
         if (p.getCurrentToken() == JsonToken.VALUE_NUMBER_INT) {
-            throw new DeserializeException(Translator.toLocale("exception.forbidden.parse"));
+            throw new DeserializeException("exception.parse.string");
         }
         return p.getValueAsString();
     }

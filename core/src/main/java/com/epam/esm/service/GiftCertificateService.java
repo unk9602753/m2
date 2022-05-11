@@ -8,9 +8,7 @@ public interface GiftCertificateService extends BaseService<GiftCertificateDto> 
 
     List<GiftCertificateDto> findByCriteria(String criteria, String name);
 
-    List<GiftCertificateDto> sort(String direction, String criteria);
+    List<GiftCertificateDto> findAllByCriteria(String direction, String criteria);
 
     void update(GiftCertificateDto giftCertificateDto, long id);
-
-    void updateObject(GiftCertificateDto dto, GiftCertificateDto patch);
 }

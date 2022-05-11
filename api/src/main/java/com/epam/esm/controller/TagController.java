@@ -27,21 +27,18 @@ public class TagController {
     @GetMapping("{id}")
     public ResponseEntity<Object> getTagById(@PathVariable long id) {
         Optional<Tag> optTag = tagService.find(id);
-        return optTag.isPresent() ? new ResponseEntity<>(optTag.get(), HttpStatus.OK)
-                : new ResponseEntity<>(Translator.toLocale("response.find.tag"), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(optTag.get(), HttpStatus.OK);
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> postTag(@Valid @RequestBody Tag tag) {
+    public void postTag(@Valid @RequestBody Tag tag) {
         tagService.create(tag);
-        return new ResponseEntity<>(Translator.toLocale("response.tag.create"), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteTag(@PathVariable long id) {
+    public void deleteTag(@PathVariable long id) {
         tagService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -23,8 +23,8 @@ public class GiftCertificateDto {
     private String name;
     @JsonDeserialize(using = StringDeserializer.class)
     private String description;
-    private Double price;
-    private Integer duration;
+    private double price;
+    private int duration;
     @JsonSerialize(using = ToStringSerializer.class)
     private LocalDateTime createDate;
     @JsonSerialize(using = ToStringSerializer.class)

@@ -28,7 +28,6 @@ public class WebConfig extends AcceptHeaderLocaleResolver implements WebMvcConfi
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
-        mapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setObjectMapper(mapper);
         converters.add(mappingJackson2HttpMessageConverter);
@@ -37,7 +36,9 @@ public class WebConfig extends AcceptHeaderLocaleResolver implements WebMvcConfi
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         String lang = request.getHeader("Accept-Language");
-        return lang == null || lang.isEmpty() ? Locale.getDefault() : Locale.lookup(Locale.LanguageRange.parse(lang), locales);
+        return lang == null || lang.isEmpty()
+                ? Locale.getDefault()
+                : Locale.lookup(Locale.LanguageRange.parse(lang), locales);
     }
 
     @Bean
